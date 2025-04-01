@@ -1,0 +1,999 @@
+/* Star Ocean 3 Walkthrough Theme */
+:root {
+    /* Re-use theme colors from the calculator */
+    --bg-color: #051524; /* MATCH YOUR BANNER: RGB(5, 21, 36) */
+    --panel-bg: rgba(26, 26, 58, 0.8);
+    --text-color: #e0e0f0;
+    --header-color: #ffffff;
+    --accent-color: #4d90fe;
+    --accent-glow: #00e6ff;
+    --highlight-bg: rgba(77, 144, 254, 0.3);
+    --border-color: rgba(77, 144, 254, 0.5);
+    --success-color: #00e676;
+    --warning-color: #ffa726;
+    --error-color: #ff5252;
+    --link-color: #80cbc4;
+    --completed-color: #8a8a9e; /* Color for checked-off text */
+
+    --font-family: 'Exo 2', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-padding-top: 20px; /* Offset for smooth scrolling target */
+}
+
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); /* Optional: Keep stardust */
+    line-height: 1.7; /* Slightly increased line height for readability */
+    padding: 0; /* Remove body padding */
+}
+
+.walkthrough-container {
+    max-width: 1600px; /* Allow wider container */
+    margin: 0 auto;
+    background: rgba(0, 0, 20, 0.6); /* Slightly less opaque */
+    box-shadow: 0 0 20px rgba(77, 144, 254, 0.4);
+}
+
+.walkthrough-header {
+    text-align: center;
+    padding: 10px 0; /* Reduced padding */
+    /* Background set by container now */
+}
+
+#main-banner {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    /* Remove border-radius if banner already has rounded corners or sharp edges */
+}
+
+.walkthrough-header h2 {
+    color: var(--accent-color);
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+.original-author {
+    font-size: 0.85em;
+    color: #aaa;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.walkthrough-body {
+    display: flex;
+    gap: 20px;
+}
+
+/* Sidebar Navigation */
+#toc-nav {
+    width: 280px; /* Fixed width sidebar */
+    flex-shrink: 0; /* Prevent shrinking */
+    background-color: var(--panel-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 20px 15px;
+    max-height: calc(100vh - 100px); /* Adjust based on header height */
+    overflow-y: auto;
+    position: sticky; /* Keep sidebar visible */
+    top: 20px; /* Adjust as needed */
+    align-self: flex-start; /* Align to top */
+}
+
+#toc-nav h3 {
+    color: var(--accent-glow);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+#toc-nav ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#toc-nav li {
+    margin-bottom: 5px;
+}
+
+#toc-nav a {
+    color: var(--link-color);
+    text-decoration: none;
+    display: block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#toc-nav a:hover {
+    background-color: var(--highlight-bg);
+    color: #fff;
+}
+
+#toc-nav .submenu {
+    padding-left: 15px;
+    margin-top: 3px;
+    font-size: 0.9em; /* Slightly smaller submenu items */
+    border-left: 1px dashed rgba(77, 144, 254, 0.3);
+    margin-left: 5px;
+}
+#toc-nav .submenu-nested {
+     padding-left: 15px;
+     margin-top: 2px;
+     font-size: 0.95em;
+     border-left: 1px dotted rgba(77, 144, 254, 0.2);
+     margin-left: 5px;
+}
+#toc-nav .submenu a, #toc-nav .submenu-nested a {
+    padding: 2px 6px;
+}
+
+
+/* Main Content Area */
+#main-content {
+    flex-grow: 1; /* Take remaining space */
+    padding: 20px 30px;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.content-section {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+.content-section:last-child {
+    border-bottom: none;
+}
+
+.content-section-inner {
+     margin-bottom: 30px;
+     padding-left: 15px;
+     border-left: 2px solid var(--accent-color);
+}
+
+
+#main-content h2 {
+    color: var(--accent-glow);
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+#main-content h3 {
+    color: var(--accent-color);
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+#main-content h4 {
+     color: var(--link-color);
+     margin-top: 20px;
+     margin-bottom: 10px;
+     font-size: 1.2em;
+     border-left: 3px solid var(--link-color);
+     padding-left: 10px;
+}
+#main-content h5 { /* For sub-sections like Boss names */
+     color: var(--warning-color);
+     margin-top: 15px;
+     margin-bottom: 8px;
+     font-size: 1.1em;
+     font-weight: 600;
+}
+#main-content h6 { /* For sub-sub-sections like Shop names */
+     color: var(--text-color);
+     margin-top: 10px;
+     margin-bottom: 5px;
+     font-size: 1em;
+     font-weight: 600;
+     border-bottom: 1px dotted var(--border-color);
+     display: inline-block; /* Make border fit text */
+     padding-bottom: 2px;
+}
+
+
+#main-content p {
+    margin-bottom: 12px;
+}
+
+#main-content ul, #main-content ol {
+    margin-left: 25px;
+    margin-bottom: 12px;
+}
+#main-content li {
+     margin-bottom: 5px;
+}
+
+#main-content dl {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+#main-content dt {
+    font-weight: bold;
+    color: var(--link-color);
+    margin-top: 10px;
+}
+#main-content dd {
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+/* Walkthrough Step Interactivity */
+.walkthrough-step {
+    display: flex;
+    align-items: flex-start; /* Align checkbox to top */
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-left: 3px solid transparent; /* Placeholder for completed state */
+    transition: border-color 0.3s ease, opacity 0.3s ease;
+}
+
+.walkthrough-checkbox {
+    flex-shrink: 0;
+    margin-top: 5px; /* Align roughly with first line of text */
+    accent-color: var(--accent-color);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.step-content {
+    flex-grow: 1;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+/* Styling for Completed Steps */
+.walkthrough-step.completed {
+    /* border-left-color: var(--success-color); */ /* Optional border highlight */
+    opacity: 0.65; /* Dim completed steps */
+}
+
+.walkthrough-step.completed .step-content {
+    color: var(--completed-color);
+    /* text-decoration: line-through; */ /* Optional strike-through */
+}
+.walkthrough-step.completed .step-content h3,
+.walkthrough-step.completed .step-content h4,
+.walkthrough-step.completed .step-content h5,
+.walkthrough-step.completed .step-content h6 {
+     /* text-decoration: line-through; */
+     color: inherit; /* Make headers inherit the dimmed color */
+}
+
+
+/* Specific Element Styles */
+.pa-marker {
+    display: inline-block;
+    background-color: var(--warning-color);
+    color: #111;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-right: 5px;
+    cursor: help; /* Indicate tooltip */
+}
+
+.boss-info, .boss-strategy {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border-left: 3px solid var(--error-color);
+    font-size: 0.95em;
+}
+.boss-strategy h6 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.shop-list ul, .item-list ul, .char-stats ul {
+    list-style: none;
+    padding-left: 0;
+}
+.shop-list li, .item-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+}
+.shop-list li span {
+    color: #a0a0c0; /* Dimmer color for price */
+    min-width: 80px; /* Align prices */
+    text-align: right;
+}
+.char-stats li {
+     border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+     padding: 2px 0;
+}
+.char-stats li strong {
+     color: var(--link-color);
+     display: inline-block;
+     width: 80px; /* Align labels */
+}
+
+/* Checklist within steps */
+ul.checklist {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+ul.checklist li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+ul.checklist li input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #00e676;
+    margin-top: 0; /* Reset margin */
+}
+
+
+.walkthrough-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #a0a0c0;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Basic Responsive: Hide sidebar behind a toggle on small screens */
+@media (max-width: 1024px) {
+    .walkthrough-body {
+        flex-direction: column;
+    }
+    #toc-nav {
+        width: 100%;
+        position: static; /* Change from sticky */
+        max-height: 300px; /* Limit height when stacked */
+        margin-bottom: 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    #main-content {
+        padding: 20px;
+    }
+    html {
+         scroll-padding-top: 10px; /* Adjust scroll offset */
+    }
+}
+/* Add to existing walkthrough_style.css */
+
+/* Styling for Top Navigation Bar */
+#top-nav {
+    background-color: var(--table-header-bg); /* Use a darker background */
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px; /* Space below top nav */
+    overflow-x: auto; /* Allow horizontal scroll on small screens */
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+#top-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Arrange items horizontally */
+    justify-content: center; /* Center items */
+    gap: 15px; /* Space between links */
+}
+
+#top-nav li {
+    display: inline-block; /* Fallback if flex not supported */
+}
+
+#top-nav a {
+    color: var(--link-color);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: block;
+}
+
+#top-nav a:hover,
+#top-nav a.active { /* Style for active page link if needed */
+    background-color: var(--accent-color);
+    color: #00001a; /* Dark text for contrast */
+    text-decoration: none;
+}
+
+/* Styling for Placeholder Sections */
+.placeholder-heading {
+    color: #888; /* Dimmed color for placeholder subheadings */
+    font-style: italic;
+    border-left: none;
+    padding-left: 0;
+}
+
+/* Adjustments for Mobile Top Nav Scroll */
+@media (max-width: 768px) {
+     #top-nav ul {
+        justify-content: flex-start; /* Align left on mobile */
+     }
+}
+/* ============================ */
+/* == Stylized Content Boxes == */
+/* ============================ */
+
+/* --- Boss Encounter Box --- */
+.boss-container {
+    background-color: rgba(40, 10, 10, 0.7); /* Dark red tint background */
+    border: 1px solid var(--error-color); /* Red border */
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 25px 0;
+    display: flex; /* Arrange image placeholder and text side-by-side */
+    gap: 20px; /* Space between image and text */
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 82, 82, 0.2); /* Inset shadow + subtle outer glow */
+}
+
+.boss-image-placeholder {
+    width: 150px; /* Adjust width as needed */
+    height: 150px; /* Adjust height as needed */
+
+    background-color: rgba(10, 10, 10, 0.5); /* Placeholder background */
+    border: 1px dashed var(--border-color);
+    flex-shrink: 0; /* Prevent placeholder from shrinking */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    color: #aaa;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.boss-details {
+    flex-grow: 1; /* Allow text details to take remaining space */
+}
+
+.boss-header { /* Style the H5 inside the container */
+    color: var(--error-color) !important; /* Make header red */
+    margin-top: 0; /* Remove top margin */
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 82, 82, 0.5); /* Reddish border */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.boss-info { /* Override default stat box styling */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    font-size: 0.9em; /* Slightly smaller stats */
+}
+.boss-info p {
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+.boss-info strong { /* Make labels stand out more */
+    color: var(--warning-color);
+    min-width: 50px; /* Adjust as needed */
+    display: inline-block;
+}
+
+.boss-strategy { /* Override default stat box styling */
+    background: none;
+    border: none;
+    padding: 10px 0 0 0;
+    margin: 10px 0 0 0;
+    border-top: 1px dotted var(--border-color); /* Separator line */
+}
+.boss-strategy h6 { /* Strategy sub-header */
+    color: var(--warning-color);
+    margin-top: 0;
+    margin-bottom: 8px;
+    border: none;
+    padding: 0;
+    font-size: 1em;
+    text-transform: uppercase;
+}
+.boss-strategy p {
+    font-size: 0.95em;
+}
+
+
+/* --- Treasure Hunt List --- */
+.treasure-hunt-list { /* Add this class to the relevant <ul> */
+    list-style: none; /* Remove default bullets */
+    padding: 10px 15px;
+    margin: 15px 0 15px 10px; /* Indent slightly */
+    background-color: rgba(10, 40, 10, 0.4); /* Dark green tint */
+    border: 1px solid var(--success-color);
+    border-left-width: 4px; /* Thicker left border */
+    border-radius: 5px;
+}
+
+.treasure-hunt-list li input[type="checkbox"] {
+    accent-color: var(--success-color); /* Green checkbox */
+}
+.treasure-hunt-list li {
+     margin-bottom: 6px;
+     padding-left: 5px;
+}
+/* Keep completed style for dimming */
+.treasure-hunt-list li.completed {
+    color: var(--completed-color);
+    opacity: 0.65;
+}
+
+/* --- Shop Inventory Box --- */
+.shop-list {
+    background-color: rgba(10, 10, 40, 0.6); /* Dark blue tint */
+    border: 1px solid var(--accent-color); /* Blue border */
+    border-radius: 8px;
+    padding: 0; /* Remove padding, add to inner elements */
+    margin: 20px 0;
+    overflow: hidden; /* Contain background/borders */
+}
+
+.shop-list h6 { /* Shop Name Header */
+    background-color: var(--table-header-bg); /* Use table header color */
+    color: var(--accent-glow);
+    padding: 8px 15px;
+    margin: 0;
+    border-bottom: 1px solid var(--accent-color);
+    font-size: 1.1em;
+    text-align: center;
+    border-radius: 0; /* Remove default border */
+    display: block; /* Ensure full width */
+}
+
+.shop-list ul {
+    list-style: none;
+    padding: 10px 15px 15px 15px; /* Padding inside the list */
+    margin: 0;
+}
+
+.shop-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dotted rgba(77, 144, 254, 0.3); /* Dotted separator */
+    font-size: 0.95em;
+}
+.shop-list li:last-child {
+    border-bottom: none;
+}
+
+.shop-list li span { /* Price */
+    color: var(--warning-color); /* Orange price */
+    min-width: 90px; /* Ensure alignment */
+    text-align: right;
+    font-weight: 500;
+}
+/* Styling for Individual Item Entries */
+/* === ADD/MODIFY THIS CSS === */
+
+/* Grid Container for Items */
+.item-grid {
+    display: grid;
+    /* Create 4 equal columns, adjust as needed */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px; /* Space between grid items */
+    margin-bottom: 30px; /* Space below the grid */
+}
+
+/* Styling for Smaller Item Entries in the Grid */
+.item-entry {
+    /* Keep existing background, border, radius, shadow */
+    background-color: rgba(26, 26, 58, 0.7); /* Slightly more opaque if needed */
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-color); /* Thinner accent */
+    border-radius: 4px;
+    padding: 10px 12px; /* Reduced padding */
+    margin-bottom: 0; /* Margin is handled by grid gap */
+    font-size: 0.9em; /* Slightly smaller base font */
+    display: flex; /* Use flexbox for internal layout */
+    flex-direction: column; /* Stack content vertically */
+    min-height: 150px; /* Optional: Set a minimum height */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.item-entry:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(77, 144, 254, 0.3);
+}
+
+
+.item-entry h6 { /* Item Name */
+    font-size: 1.05em; /* Slightly smaller */
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.item-stats, .item-area-of-use {
+    /* Keep existing display:flex, flex-wrap, gap */
+    gap: 5px 15px; /* Reduced gap */
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    font-size: 0.85em; /* Smaller stats */
+    flex-shrink: 0; /* Prevent shrinking */
+    border-bottom: 1px dotted rgba(77, 144, 254, 0.2); /* Lighter dot */
+}
+
+.item-stats span, .item-area-of-use span {
+    min-width: 65px; /* Adjust alignment width */
+}
+
+.item-details {
+    margin-left: 0;
+    font-size: 0.9em; /* Smaller details */
+    flex-grow: 1; /* Allow details to take remaining space */
+    overflow: hidden; /* Hide overflow if needed, or adjust min-height */
+}
+
+.item-details dt {
+    margin-top: 5px; /* Reduced space */
+    font-weight: 500; /* Slightly less bold */
+    font-size: 0.9em;
+}
+
+.item-details dd {
+    margin-left: 10px; /* Reduced indent */
+    margin-bottom: 3px;
+    line-height: 1.5; /* Adjust line height for smaller text */
+    /* overflow-wrap: break-word; */ /* Handle long words if necessary */
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 1400px) {
+    .item-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
+}
+
+@media (max-width: 1024px) {
+    /* Keep 3 columns for tablets, or switch to 2 */
+    .item-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+     /* Adjust item entry styling for slightly smaller screens if needed */
+    .item-entry {
+         font-size: 0.88em;
+    }
+    .item-entry h6 {
+        font-size: 1em;
+    }
+
+}
+
+@media (max-width: 768px) {
+    .item-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+        gap: 10px;
+    }
+     .item-entry {
+         padding: 8px 10px;
+         font-size: 0.85em;
+     }
+}
+
+@media (max-width: 500px) {
+    .item-grid {
+        grid-template-columns: repeat(1, 1fr); /* 1 column */
+    }
+}
+
+/* Search Input Styling */
+#item-search-container {
+    margin-bottom: 25px;
+    padding: 10px;
+    background-color: var(--panel-bg);
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+
+#item-search {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 20, 0.7);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1em;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#item-search:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Style for hidden items (used by JS) */
+.item-entry.hidden {
+    display: none;
+}
+
+
+/* === END OF ADDED/MODIFIED CSS === */
+
+/* Specific styling for different item types if needed 
+.item-entry.weapon {}
+.item-entry.armor {}
+.item-entry.accessory {}
+.item-entry.usable-item {}
+.item-entry.food {}
+.item-entry.other-item {}
+.item-entry.material {}
+.item-entry.valuable {}*/
+
+/* === ADD/MODIFY THIS CSS for Characters === */
+
+/* Grid Container for Characters */
+/* === UPDATE THESE CHARACTER & GRID STYLES === */
+
+/* Grid Container for Characters */
+.character-grid {
+    display: grid;
+    /* --- CHANGE: Start with 3 columns --- */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Space between character cards */
+}
+
+/* Styling for Individual Character Cards */
+.character-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    display: flex; /* Keep image + details side-by-side */
+    gap: 15px;
+    align-items: flex-start;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    overflow: hidden; /* Important: Prevent content spilling out */
+}
+
+.character-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px rgba(77, 144, 254, 0.3);
+}
+
+/* Character Image Placeholder/Container */
+.character-image {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    background-color: rgba(0, 0, 20, 0.5);
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.character-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Character Text Details Container */
+.character-details {
+    flex-grow: 1;
+    min-width: 0; /* Still important for flex shrinking */
+    /* REMOVED internal display:flex */
+}
+
+/* Styling within the character card */
+.character-card h3 {
+    color: var(--accent-color);
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+     /* Ensure long names wrap */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.character-card .char-stats {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.character-card .char-stats li {
+    padding: 3px 0; /* Slightly more vertical space */
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.15);
+    line-height: 1.5;
+    /* REMOVED display:flex from here - let strong/text flow naturally */
+}
+.character-card .char-stats li:last-child {
+    border-bottom: none;
+}
+
+.character-card .char-stats li strong {
+     color: var(--link-color);
+     display: inline-block; /* Keep inline-block */
+     /* Optional: Set a fixed width if you prefer labels aligned */
+     /* width: 70px; */
+     margin-right: 8px; /* Space after label */
+}
+
+/* Value text will flow after strong */
+
+.character-card p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin-bottom: 0;
+    /* Keep word wrapping */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Hide the original walkthrough checkbox */
+.character-card .walkthrough-checkbox {
+    display: none;
+}
+
+/* --- Responsive Grid Adjustments (Updated) --- */
+@media (max-width: 1024px) {
+     /* Go to 2 columns earlier now that we start at 3 */
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Keep 2 columns for smaller tablets, maybe 1 */
+    .character-grid {
+         /* grid-template-columns: repeat(2, 1fr); */ /* Option 1: Keep 2 */
+         grid-template-columns: repeat(1, 1fr);   /* Option 2: Go to 1 earlier */
+    }
+
+}
+
+/* === END OF UPDATED CHARACTER STYLES === */
+
+/* === END OF CHARACTER CSS === */
+/* === PA CALCULATOR STYLES === */
+#pa-calculator-section { border-top: 2px solid var(--accent-color); margin-top: 40px; padding-top: 20px; }
+#pa-calculator { display: flex; flex-direction: row; gap: 25px; background-color: rgba(10, 20, 40, 0.5); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+#pa-choices-area { flex: 3; max-height: 70vh; /* Use viewport height */ overflow-y: auto; padding-right: 10px; border-right: 1px solid var(--border-color); }
+#pa-scores-area { flex: 1; min-width: 220px; /* Slightly wider */ display: flex; flex-direction: column; /* Stack titles and reset button */ }
+#pa-calculator h3 { color: var(--accent-glow); margin-top: 0; margin-bottom: 15px; font-size: 1.3em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; flex-shrink: 0; }
+#pa-list { list-style: none; padding-left: 0; margin-left: 0; }
+.pa-item { margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px dotted var(--border-color); }
+.pa-item:last-child { border-bottom: none; margin-bottom: 0; }
+.pa-item .pa-meta { font-size: 0.85em; color: var(--completed-color); margin-bottom: 5px; line-height: 1.4; } /* Smaller meta text */
+.pa-item .pa-action { font-weight: 500; color: var(--text-color); margin-bottom: 10px; } /* Action text */
+.pa-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.pa-choice-button { padding: 6px 12px; background-color: var(--panel-bg); border: 1px solid var(--border-color); color: var(--link-color); font-family: var(--font-family); font-size: 0.9em; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; text-align: left; }
+.pa-choice-button:hover { background-color: var(--highlight-bg); border-color: var(--accent-color); color: #fff; }
+.pa-choice-button.selected { background-color: var(--accent-color); color: #00001a; border-color: var(--accent-glow); font-weight: bold; }
+#pa-scores-display { flex-grow: 1; /* Allow score area to take vertical space */ }
+.scores-column { margin-bottom: 15px; } /* Space between score columns */
+.scores-column h4 { color: var(--accent-color); font-size: 1.1em; margin-bottom: 10px; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px; }
+#character-scores-others, #character-scores-fayt { list-style: none; padding-left: 0; margin-left: 0; margin-bottom: 0; /* Removed bottom margin */ }
+.score-entry { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted rgba(77, 144, 254, 0.2); font-size: 0.95em; }
+.score-entry:last-child { border-bottom: none; }
+.score-entry .char-name { color: var(--text-color); text-transform: capitalize; }
+.score-entry .char-score { color: var(--warning-color); font-weight: bold; min-width: 40px; text-align: right; }
+#reset-pa-scores { display: block; width: 100%; padding: 10px 15px; background-color: var(--error-color); color: #111; border: none; border-radius: 4px; font-family: var(--font-family); font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease, opacity 0.2s ease; margin-top: auto; /* Push reset button to bottom */ flex-shrink: 0; }
+#reset-pa-scores:hover { background-color: #ff7575; opacity: 0.9; }
+.loading-pa { color: var(--completed-color); font-style: italic; }
+@media (max-width: 900px) {
+    #pa-calculator { flex-direction: column; }
+    #pa-choices-area { border-right: none; border-bottom: 1px solid var(--border-color); padding-right: 0; padding-bottom: 15px; margin-bottom: 15px; max-height: 50vh; }
+    #pa-scores-area { min-width: unset; flex-direction: row; gap: 20px; /* Put score columns side-by-side */ align-items: flex-start;}
+    #pa-scores-display { display: flex; gap: 20px; flex-grow: 1;}
+    .scores-column { flex: 1; }
+    #reset-pa-scores { margin-top: 0; width: auto; /* Adjust reset button size if needed */ }
+}
+@media (max-width: 600px) {
+     #pa-scores-area { flex-direction: column; gap: 15px; } /* Stack scores again on very small screens */
+     #pa-scores-display { flex-direction: column; gap: 15px;}
+     #reset-pa-scores { width: 100%; }
+}
+
+/* Responsive Base Styles */
+@media (max-width: 1024px) {
+    .walkthrough-body { flex-direction: column; }
+    #toc-nav { width: 100%; position: static; max-height: 300px; margin-bottom: 20px; border-right: none; border-bottom: 1px solid var(--border-color); }
+    #main-content { padding: 0 5px; } /* Adjust padding */
+    html { scroll-padding-top: 10px; }
+}
+/* === MODAL STYLES === */
+/* === Additions/Modifications for Tooltip & Suggestions === */
+
+/* Tooltip Style (Ensure this exists and is correct) */
+#pa-tooltip {
+    position: fixed; /* Use fixed positioning relative to viewport */
+    background-color: rgba(5, 21, 36, 0.95);
+    border: 1px solid var(--accent-glow);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.85em;
+    color: var(--text-color);
+    z-index: 1100;
+    pointer-events: none;
+    display: none; /* Initially hidden */
+    white-space: pre;
+    box-shadow: 0 2px 10px rgba(0, 230, 255, 0.3);
+    max-width: 300px; /* Prevent it getting too wide */
+}
+
+/* Target Ending Selection */
+#pa-target-selector {
+    margin-bottom: 20px; /* Space below selector */
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+#pa-target-selector label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--accent-glow);
+    font-weight: 500;
+}
+#pa-target-select {
+    width: 100%;
+    padding: 8px 10px;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 0.95em;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#pa-target-select option {
+     background-color: var(--bg-color);
+     color: var(--text-color);
+}
+
+/* Suggestion Highlighting in Modal */
+.modal-choice-button.suggestion-good {
+    border-color: var(--success-color);
+    box-shadow: 0 0 5px rgba(0, 230, 118, 0.5); /* Green glow */
+}
+.modal-choice-button.suggestion-bad {
+    border-color: var(--error-color);
+    /* Optional: slightly dimmer text or background */
+    /* opacity: 0.8; */
+     box-shadow: 0 0 5px rgba(255, 82, 82, 0.4); /* Red glow */
+}
+.modal-choice-button.suggestion-neutral {
+    /* Keep default appearance */
+    opacity: 0.7; /* Slightly dim neutral choices */
+}

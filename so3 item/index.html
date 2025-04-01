@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern SO3 Item Creation Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+              
+        <header id="banner-header">
+            <span class="visually-hidden">Star Ocean 3 Item Creation Calculator</span>
+        </header>
+
+   
+
+        <!-- ADD EXPERIMENTAL TOGGLE BUTTON -->
+        <div class="experimental-toggle">
+            <button id="toggle-experimental-button">Show Optimal Crafter Finder (Experimental)</button>
+        </div>
+        <!-- END OF ADDITION -->
+
+        <main>
+            <!-- ADD EXPERIMENTAL SECTION (Initially hidden) -->
+            <section id="optimal-finder-section" class="panel hidden">
+                <h3>Optimal Crafter Finder</h3>
+                 <p class="help-text">Select an item to find the best inventor combination (up to 3) to maximize success chance.</p>
+                <div class="optimal-controls">
+                    <select id="optimal-category-select">
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <select id="optimal-item-select" disabled>
+                        <option value="">-- Select Item --</option>
+                    </select>
+                    <label class="optimal-bonus-label">
+                        <input type="checkbox" id="optimal-bonus-checkbox"> Use Bonus Item?
+                    </label>
+                    <button id="find-optimal-button" disabled>Find Best Crafters</button>
+                </div>
+                <div id="optimal-results-display" class="results-display" style="margin-top: 20px;">
+                    <!-- Optimal results will be shown here -->
+                    <p>Please select a category and item.</p>
+                </div>
+            </section>
+            <!-- END OF ADDITION -->
+
+
+            <!-- Original Calculator Sections -->
+            <section id="category-section" class="panel">
+                <h3>1. Select Crafting Category (Original Mode)</h3>
+                <select id="category-select">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <div id="bonus-item-section" class="bonus-item hidden">
+                    <label>
+                        <input type="checkbox" id="bonus-item-checkbox">
+                        <span id="bonus-item-label">Has Bonus Item?</span>
+                    </label>
+                </div>
+            </section>
+
+            <div class="calculator-layout">
+                <section id="inventor-section" class="panel hidden">
+                    <h3>2. Select Inventors (Max 3)</h3>
+                    <div id="inventor-stats" class="stats-display">
+                        <!-- Stats will be displayed here -->
+                    </div>
+                    <div class="table-container">
+                        <table id="inventor-table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Name</th>
+                                    <th>Skill</th>
+                                    <th>Time Adj</th>
+                                    <th>Cost Adj</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventor-table-body">
+                                <!-- Inventors will be listed here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="item-creation-section" class="panel hidden">
+                    <h3>3. Item Creation Details</h3>
+                    <div id="item-selection-area">
+                        <label for="item-select">Item to Create:</label>
+                        <select id="item-select">
+                            <option value="">-- Select Item --</option>
+                        </select>
+                    </div>
+                    <div id="item-stats" class="stats-display">
+                        <!-- Item stats (cost, difficulty, probability) -->
+                    </div>
+                    <div id="creation-results" class="results-display">
+                         <h4>Potential Outcomes & Duplicates</h4>
+                         <p class="help-text">Values are calculated base costs. Items marked with (*) share the same base cost as your target and always overlap.</p>
+                         <ul id="result-list">
+                            <!-- Results list -->
+                         </ul>
+                         <div id="creation-impossible" class="hidden error-message">
+                            <!-- Impossible message -->
+                         </div>
+                    </div>
+                </section>
+            </div>
+
+            <section id="reference-section" class="panel hidden">
+                <h3>Reference: All Items in Category</h3>
+                 <div class="table-container">
+                    <table id="reference-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Base Cost</th>
+                                <th>Difficulty</th>
+                                <th>Possible Inventors</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reference-table-body">
+                            <!-- Full item list for category -->
+                        </tbody>
+                    </table>
+                 </div>
+            </section>
+
+        </main>
+
+        <footer>
+            <button id="credits-button">Credits & Special Thanks</button>
+            <div id="credits-content" class="hidden">
+                <p><strong>Modernization & Styling:</strong> Ometopi</p>
+                <p><strong>Original JavaScript Calculator v1.02 By:</strong> Aerius</p>
+                <p><strong>Original Modifications:</strong> Brian Pendell (17 MAR 2014, 26 Dec 2021)</p>
+                <p><strong>Special Thanks (from original):</strong> Alex Eagleson (A I e x), Edward Change (EChang), Roger Pope (durias42), Terance, Andrew (randomstuff), Brian Pendell.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Make sure data.js is loaded BEFORE script.js -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

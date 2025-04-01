@@ -1,0 +1,138 @@
+/* Basic Body Styling & Font */
+body {
+    background-color: #0a0f1f; /* Dark blue space background */
+    color: #e0faff;
+    font-family: 'Orbitron', sans-serif; /* Futuristic font */
+    padding: 20px;
+}
+
+h1 {
+    color: #7fcdff;
+    text-shadow: 0 0 5px rgba(127, 205, 255, 0.5);
+    margin-bottom: 30px;
+}
+
+/* --- Star Ocean 3 Checkbox Styles --- */
+
+.so3-checkbox-container {
+    margin-bottom: 15px;
+    display: block; /* Ensure labels stack nicely */
+}
+
+/* Hide the default checkbox */
+.so3-checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Style the label - this is what users interact with */
+.so3-checkbox-label {
+    position: relative;
+    cursor: pointer;
+    padding-left: 35px; /* Space for the custom checkbox */
+    display: inline-flex; /* Align text vertically with the box */
+    align-items: center;
+    min-height: 24px; /* Ensure consistent height */
+    font-size: 1em;
+    color: #adecfc; /* Light cyan text */
+    user-select: none; /* Prevent text selection on click */
+    transition: color 0.2s ease-in-out;
+}
+
+/* The visual representation of the checkbox */
+.so3-checkbox-visual {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 22px;
+    width: 22px;
+    background-color: rgba(10, 30, 50, 0.7); /* Dark, semi-transparent blue */
+    border: 2px solid #4f9fbf; /* Medium blue border */
+    border-radius: 3px; /* Slightly rounded corners */
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 5px rgba(79, 159, 191, 0.3), /* Outer glow */
+                inset 0 0 4px rgba(10, 30, 50, 0.6); /* Inner shadow for depth */
+}
+
+/* Style the checkmark (using ::after pseudo-element) */
+.so3-checkbox-visual::after {
+    content: "";
+    position: absolute;
+    /* Position the checkmark */
+    left: 7px;
+    top: 3px;
+    /* Create the checkmark shape using borders */
+    width: 5px;
+    height: 11px;
+    border: solid #e0faff; /* Bright cyan/white */
+    border-width: 0 3px 3px 0;
+    /* Rotate to make it a checkmark */
+    transform: rotate(45deg) scale(0); /* Start hidden and scaled down */
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+}
+
+/* --- States --- */
+
+/* Hover state for the label */
+.so3-checkbox-label:hover .so3-checkbox-visual {
+    border-color: #7fcdff; /* Brighter border on hover */
+    box-shadow: 0 0 10px rgba(127, 205, 255, 0.6), /* Enhanced glow */
+                inset 0 0 4px rgba(10, 30, 50, 0.6);
+}
+.so3-checkbox-label:hover {
+    color: #ffffff; /* Brighten text on hover */
+}
+
+
+/* Checked state */
+.so3-checkbox-input:checked + .so3-checkbox-label .so3-checkbox-visual {
+    background-color: #1a5f7f; /* Slightly more saturated blue */
+    border-color: #a0e0ff; /* Even brighter border */
+    box-shadow: 0 0 12px rgba(160, 224, 255, 0.8), /* Stronger glow */
+                inset 0 0 6px rgba(10, 20, 40, 0.7);
+}
+
+/* Show the checkmark when checked */
+.so3-checkbox-input:checked + .so3-checkbox-label .so3-checkbox-visual::after {
+    opacity: 1;
+    transform: rotate(45deg) scale(1); /* Scale up to full size */
+}
+
+/* Focus state (for accessibility) */
+.so3-checkbox-input:focus + .so3-checkbox-label .so3-checkbox-visual {
+    /* Use outline or a stronger box-shadow for focus */
+    outline: 2px solid #ffcc00; /* Gold outline stands out */
+    outline-offset: 2px;
+    /* Alternatively, use box-shadow for focus ring: */
+    /* box-shadow: 0 0 12px rgba(160, 224, 255, 0.8),
+                inset 0 0 6px rgba(10, 20, 40, 0.7),
+                0 0 0 3px rgba(255, 204, 0, 0.6); */
+}
+/* Optional: Remove default browser focus outline if using custom */
+.so3-checkbox-input:focus {
+   outline: none;
+}
+
+
+/* Disabled state */
+.so3-checkbox-input:disabled + .so3-checkbox-label {
+    cursor: not-allowed;
+    color: #6a7f8f; /* Dimmed text color */
+}
+
+.so3-checkbox-input:disabled + .so3-checkbox-label .so3-checkbox-visual {
+    background-color: rgba(50, 60, 70, 0.5);
+    border-color: #4a5f6f;
+    box-shadow: inset 0 0 4px rgba(10, 10, 10, 0.5); /* Remove glow */
+}
+
+/* Dim the checkmark if disabled & checked */
+.so3-checkbox-input:checked:disabled + .so3-checkbox-label .so3-checkbox-visual::after {
+    border-color: #7a8f9f; /* Dimmed checkmark color */
+    opacity: 0.6;
+}

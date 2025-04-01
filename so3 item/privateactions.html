@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Ocean 3 - PA Affection Calculator</title>
+    <!-- Link to the common CSS file -->
+    <link rel="stylesheet" href="walkthrough_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="walkthrough-container">
+
+        <div class="walkthrough-header">
+            <!-- Optional Banner -->
+            <!-- <img id="main-banner" src="placeholder_banner.jpg" alt="Star Ocean 3 Banner"> -->
+            <h1>Affection Calculator</h1>
+            <p class="original-author">Based on PA Data from Yhkam Daync's FAQ v1.3</p>
+        </div>
+
+        <div id="main-content"> <!-- Use main-content for consistent padding/margins -->
+             <!-- PA CALCULATOR SECTION -->
+            <section id="pa-calculator-section" class="content-section" style="border-bottom: none;"> <!-- Remove bottom border for standalone page -->
+                <p style="text-align: center; margin-bottom: 20px;">Select the choices made during Private Actions to track affection scores. Scores required for endings: **Others towards Fayt: 50+**, **Fayt towards Character: 21+**.</p>
+
+                <div id="pa-calculator">
+                    <div id="pa-choices-area">
+                        <h3>Private Action Choices</h3>
+                        <ul id="pa-list">
+                            <!-- PA items will be generated here by JavaScript -->
+                             <li class="loading-pa">Loading PA data...</li>
+                        </ul>
+                    </div>
+
+                    <div id="pa-scores-area">
+                        <h3>Character Scores</h3>
+                        <div id="pa-target-selector">
+                            <label for="pa-target-select">Suggest choices for ending:</label>
+                            <select id="pa-target-select">
+                                <option value="">-- None --</option>
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+                        <div id="pa-scores-display">
+                            <div class="scores-column">
+                                <h4>Others → Fayt</h4>
+                                <ul id="character-scores-others">
+                                    <!-- Scores will be generated here -->
+                                </ul>
+                            </div>
+                            <div class="scores-column">
+                                <h4>Fayt → Others</h4>
+                                <ul id="character-scores-fayt">
+                                    <!-- Scores will be generated here -->
+                                </ul>
+                             </div>
+                        </div>
+                        <button id="reset-pa-scores">Reset All Scores</button>
+                    </div>
+                </div>
+            </section>
+            <!-- END PA CALCULATOR SECTION -->
+
+        </div> <!-- End #main-content -->
+
+    </div> <!-- End .walkthrough-container -->
+
+    <script>
+        // --- PA Data Structure ---
+        const startingScoresOthers = { // Others towards Fayt
+            sophia: 26, cliff: 19, maria: 22, nel: 19, roger: 21,
+            albel: 17, peppita: 20, mirage: 20, adray: 22
+        };
+        const startingScoresFayt = { // Fayt towards Others
+            sophia: 24, cliff: 19, maria: 21, nel: 17, roger: 19,
+            albel: 16, peppita: 20, mirage: 23, adray: 21
+        };
+
+        const trackedCharacters = ["sophia", "cliff", "maria", "nel", "roger", "albel", "peppita", "mirage", "adray"];
+
+        const paData = [
+            // --- PA Data transcribed from FAQ ---
+            { paId: "PA1", location: "Grantier Resort Hotel, Room 105", availability: "Before playing in the Battle Simulator", requirements: "Must not have spoken to Fayt's parents yet", action: "Check the garbage can in the room.", choices: [ { text: "Checked garbage can", effects: { other_sophia: -3, other_cliff: -1, other_maria: -3, other_nel: -3, other_roger: 1, other_albel: -1, other_peppita: -1, other_mirage: -3, other_adray: 1, fayt_sophia: -1 } } ] },
+            { paId: "PA2", location: "Grantier Resort Hotel, Private Beach", availability: "Before playing in the Battle Simulator", requirements: "Must not have spoken to Fayt's parents yet", action: "Talk to Sophia", choices: [ { text: "Talked to Sophia", effects: { other_sophia: 5, other_cliff: -3, other_maria: 5, other_nel: -3, other_albel: 5, other_peppita: -3, other_adray: 2, fayt_sophia: -5 } } ] },
+            { paId: "PA3", location: "Grantier Resort Hotel, Private Beach", availability: "Before playing in the Battle Simulator", requirements: "None", action: "Talk to the young woman (not fox-person)", choices: [ { text: "Choice 1: Uh, yeah. Something like that.", effects: { other_sophia: -5, other_cliff: 2, other_maria: -5, other_nel: -1, other_roger: 3, other_albel: 3, other_mirage: -1, other_adray: 2, fayt_sophia: -5 } }, { text: "Choice 2: Huh? Oh, just some little kid. Never seen her.", effects: { other_sophia: -8, other_cliff: -3, other_maria: -5, other_nel: -3, other_roger: -3, other_peppita: -3, other_mirage: -3, other_adray: -1, fayt_sophia: -5 } }, { text: "Choice 3: My girlfriend! She's pretty cute, huh?", effects: { other_sophia: 6, other_cliff: -3, other_nel: 2, other_roger: -2, other_albel: -3, other_peppita: 1, other_mirage: 1, other_adray: -2, fayt_sophia: 8 } } ] },
+            { paId: "PA4", location: "Grantier Resort Hotel, Transporter to Private Beach", availability: "Before playing in the Battle Simulator", requirements: "Must have seen PA3 and have chosen option 1 or option 2.", action: "Automatic", choices: [ { text: "Automatic Event", effects: { other_cliff: -3, other_maria: -3, other_nel: -3, other_roger: 3, other_albel: -5, other_peppita: 1, other_mirage: -3, other_adray: -2, fayt_sophia: 3 } } ] },
+            { paId: "PA5", location: "Grantier Resort Hotel, Rossetti Troupe's waiting room", availability: "Before playing in the Battle Simulator", requirements: "None", action: "Enter the room in the Northeast corner of the hotel lobby", choices: [ { text: "Choice 1: No, I believe you.", effects: { other_sophia: 2, other_cliff: 1, other_maria: 1, other_nel: 1, other_roger: 1, other_albel: -1, other_peppita: 3, other_mirage: 1, other_adray: 2, fayt_sophia: 1, fayt_peppita: 3 } }, { text: "Choice 2: You're exaggerating a bit, aren't you?", effects: { other_sophia: -2, other_cliff: 2, other_nel: 1, other_roger: -2, other_albel: 3, other_peppita: -5, other_mirage: -1, other_adray: -1, fayt_peppita: -3 } } ] },
+            { paId: "PA6", location: "Grantier Resort Hotel, Rossetti Troupe's waiting room", availability: "Before playing in the Battle Simulator, after PA5", requirements: "See PA5", action: "Approach the barricaded door in the south end of the room", choices: [ { text: "Approached Door", effects: { other_sophia: -3, other_roger: 3, other_peppita: -3, other_adray: 2 } } ] },
+            { paId: "PA7", location: "Grantier Resort Hotel, Lounge", availability: "Storyline", requirements: "None", action: "Access one of the Game Room panels in the lounge", choices: [ { text: "Choice 1: Don't worry, I'll protect you.", effects: { other_sophia: 3, other_maria: 1, other_roger: 2, other_peppita: 1, other_mirage: 1, other_adray: 4, fayt_sophia: 1 } }, { text: "Choice 2: I see. You don't like hanging out with me.", effects: { other_sophia: -3, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -3, other_peppita: -1, other_mirage: -2, other_adray: -2, fayt_sophia: 3 } } ] },
+            { paId: "PA8", location: "Grantier Resort Hotel, Game Room", availability: "Storyline", requirements: "PA7", action: "Choose options before starting game", choices: [ { text: "Choose other options first", effects: { other_sophia: 1, other_maria: 1, other_nel: 1, other_mirage: 1, other_adray: -1, fayt_sophia: 1 } }, { text: "Choose 'Start Game' first", effects: { other_sophia: 1, other_cliff: 1, other_roger: 1, other_albel: 1, other_peppita: 1, other_adray: 1, fayt_sophia: 2 } } ] },
+            { paId: "PA9", location: "Grantier Resort Hotel, Game Room", availability: "Storyline", requirements: "Must have won the first round of battle", action: "N/A", choices: [ { text: "Choice 1: Let's try again.", effects: { other_sophia: -3, other_cliff: 2, other_maria: -1, other_nel: -3, other_roger: 3, other_albel: 2, other_peppita: -2, other_mirage: 3, other_adray: 2, fayt_sophia: -2 } }, { text: "Choice 2: Let's just give up.", effects: { other_cliff: -1, other_maria: 1, other_roger: -3, other_albel: -4, other_peppita: 2, other_mirage: 1, other_adray: -2, fayt_sophia: -2 } } ] },
+            { paId: "PA10", location: "Grantier Resort Hotel, Game Room", availability: "Storyline", requirements: "Must have won second round of battle", action: "N/A", choices: [ { text: "Choice 1: This is good exercise for her.", effects: { other_sophia: -3, other_cliff: -3, other_maria: -2, other_nel: -4, other_roger: -2, other_albel: 4, other_peppita: -4, other_mirage: -3, other_adray: 4, fayt_sophia: -2 } }, { text: "Choice 2: I guess that's about it for today.", effects: { other_sophia: 2, other_cliff: 1, other_maria: 2, other_nel: 2, other_roger: 1, other_peppita: 2, other_mirage: 3, other_adray: -1 } } ] }, // FAYT points missing for Choice 2 in source - assuming 0
+            { paId: "PA11", location: "Grantier Resort Hotel, Game Room", availability: "Storyline", requirements: "Lose or escape a battle", action: "N/A", choices: [ { text: "Escape Battle", effects: { other_sophia: -1, other_maria: -2, other_nel: -3, other_albel: -4, other_peppita: 2, other_adray: -4 } }, { text: "Lose Battle", effects: { other_sophia: 2, other_cliff: -1, other_nel: -3, other_roger: -2, other_albel: -4, other_mirage: 2, other_adray: -2, fayt_sophia: 1 } } ] },
+            { paId: "PA12", location: "Grantier Resort Hotel, Rossetti Troupe's waiting room", availability: "After Battle Simulator", requirements: "None", action: "Go to the Rossettis' room and speak to Peppita", choices: [ { text: "Spoke to Peppita", effects: { other_sophia: 3, other_maria: -3, other_nel: 3, other_albel: -3, other_peppita: 5, other_adray: 3, fayt_sophia: 3, fayt_peppita: 3 } } ] },
+            { paId: "PA13", location: "Evacuation Facility", availability: "After speaking to Rossettis (Room 509), before putting Sophia to bed", requirements: "None", action: "Talk to Peppita and Ursus in east stairwell", choices: [ { text: "Choice 1: No, that's not true.", effects: { other_sophia: 3, other_cliff: 3, other_maria: 3, other_nel: 3, other_roger: 3, other_albel: 1, other_peppita: 5, other_mirage: 3, other_adray: 3 } }, { text: "Choice 2: Why couldn't you just mind your own business?!", effects: { other_sophia: -5, other_cliff: -5, other_maria: -5, other_nel: -5, other_roger: -5, other_albel: -5, other_mirage: -5, other_adray: -5, fayt_sophia: -3, fayt_peppita: -5 } } ] },
+            { paId: "PA14", location: "Transport Ship Helre, Bridge", availability: "After Vendeeni attack, before entering Escape Pod", requirements: "N/A", action: "Talk to crew about bloodtype.", choices: [ { text: "Choice 1: Type A", effects: { other_cliff: -1, other_maria: 1, other_nel: 1, other_mirage: -1, other_adray: -1 } }, { text: "Choice 2: Type B", effects: { other_sophia: -1, other_nel: -1, other_roger: 1, other_mirage: 1, other_adray: 1 } }, { text: "Choice 3: Type O", effects: { other_sophia: 1, other_maria: -1, other_albel: 1, other_peppita: -1 } }, { text: "Choice 4: Type AB", effects: { other_cliff: 1, other_roger: -1, other_albel: -1, other_peppita: 1 } } ] },
+            { paId: "PA15", location: "Transport Ship Helre, Central Starboard Corridor", availability: "After Vendeeni attack, before entering Escape Pod", requirements: "Door to Escape Pods must be unblocked", action: "Talk to attendants (Upper), then Rossettis (Lower)", choices: [ { text: "Completed Task", effects: { other_sophia: 2, other_cliff: 3, other_maria: 1, other_nel: 1, other_roger: 3, other_albel: -2, other_peppita: 5, other_mirage: 1, other_adray: 3, fayt_sophia: 3, fayt_peppita: 2 } } ] },
+            { paId: "PA16", location: "Escape Pod", availability: "Storyline", requirements: "None", action: "N/A", choices: [ { text: "Choice 1: Let's check it out...", effects: { other_sophia: 2, other_cliff: 1, other_maria: 1, other_nel: 1, other_roger: -2, other_albel: -2, other_peppita: 1, other_mirage: 1, other_adray: -1 } }, { text: "Choice 2: I'm sure it's okay.", effects: { other_sophia: -2, other_maria: 1, other_roger: 2, other_albel: 2, other_peppita: -1, other_mirage: 2, other_adray: 1 } } ] },
+            { paId: "PA17", location: "Royal City of Airyglyph, Aqueduct entrance", availability: "Before leaving Kirlsa for Granah Hills", requirements: "None", action: "Talk to Cliff near Aqueducts entrance", choices: [ { text: "Choice 1: I'm worried about Mirage.", effects: { other_sophia: 1, other_cliff: 1, other_maria: 2, other_nel: 1, other_roger: 1, other_albel: -1, other_peppita: 1, other_mirage: 1, other_adray: 2, fayt_cliff: -2 } }, { text: "Choice 2: I never dreamed something like this would happen.", effects: { other_sophia: -1, other_cliff: -2, other_maria: -3, other_nel: -1, other_roger: -1, other_albel: -3, other_mirage: -2, other_adray: -2, fayt_cliff: 2 } } ] },
+            { paId: "PA18", location: "Mining Town of Kirlsa, 'Iron Maiden' Inn", availability: "After saving Nel/Tynave/Farleen, before returning to Arias", requirements: "Must not have returned to Arias yet", action: "Talk to Nel upstairs.", choices: [ { text: "Choice 1: I just felt like it.", effects: { other_sophia: 1, other_cliff: 3, other_maria: -1, other_nel: -3, other_roger: 1, other_albel: -2, other_peppita: 1, other_mirage: 1, other_adray: 5, fayt_cliff: 1, fayt_nel: -2 } }, { text: "Choice 2: I thought I should make it up to you.", effects: { other_sophia: -1, other_cliff: 2, other_maria: -2, other_nel: -1, other_albel: 3, other_peppita: -1, other_adray: 2, fayt_nel: -2 } }, { text: "Choice 3: You can't expect us to abandon you.", effects: { other_sophia: 3, other_cliff: 3, other_maria: 1, other_nel: 3, other_roger: 2, other_peppita: 3, other_mirage: 2, other_adray: 2, fayt_cliff: 3, fayt_nel: 2 } } ] },
+            { paId: "PA19", location: "Peterny, 'The Biting Kid' Tavern", availability: "After arriving in Peterny, before resting at Inn", requirements: "Must be done before resting", action: "Talk to one of the guys at tables inside.", choices: [ { text: "Choice 1: Yeah, I've heard of them.", effects: { other_sophia: -2, other_cliff: 2, other_maria: 1, other_nel: -2, other_roger: 4, other_albel: 3, other_peppita: -3, other_mirage: -1, other_adray: -2 } }, { text: "Choice 2: No, I've never heard of them.", effects: { other_sophia: 2, other_cliff: 1, other_nel: -2, other_peppita: 2, other_mirage: 1, other_adray: 2 } } ] },
+            { paId: "PA20", location: "Duggus Forest, Grapebind area", availability: "During search for Ameena", requirements: "None", action: "Give Fairy water from a 'boiling' spring", choices: [ { text: "Gave boiling water", effects: { other_sophia: -3, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -3, other_mirage: -1, other_adray: -1 } } ] },
+            { paId: "PA21", location: "Duggus Forest, Moonshadow Clan's hideout", availability: "During search for Ameena", requirements: "None", action: "Find cabin and watch scene.", choices: [ { text: "Choice 1: Ask Roger to help.", effects: { other_sophia: 2, other_cliff: -2, other_maria: -1, other_nel: 2, other_roger: 3, other_albel: -3, other_peppita: 2, other_mirage: -2, other_adray: 2, fayt_cliff: -2, fayt_nel: 1, fayt_roger: 2 } }, { text: "Choice 2: Turn down his offer to help.", effects: { other_sophia: -1, other_cliff: 3, other_maria: 2, other_nel: -1, other_roger: -3, other_albel: 3, other_peppita: -2, other_mirage: 2, other_adray: -2, fayt_cliff: -2, fayt_nel: -1, fayt_roger: -2 } } ] },
+            { paId: "PA22", location: "Peterny, West Side, 'The Front Door' Luxury Inn", availability: "After rescuing Ameena, before war begins", requirements: "None", action: "Speak to Ruddle and Rumina in second guest room.", choices: [ { text: "Choice 1: North gate.", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -2, other_mirage: -2, other_adray: -2 } }, { text: "Choice 2: Go east.", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -2, other_mirage: -2, other_adray: -2 } }, { text: "Choice 3: South gate.", effects: { other_sophia: 2, other_cliff: 2, other_maria: 2, other_nel: 2, other_roger: 2, other_albel: 1, other_peppita: 2, other_mirage: 2, other_adray: 2 } }, { text: "Choice 4: West gate.", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -2, other_mirage: -2, other_adray: -2 } } ] },
+            { paId: "PA23", location: "Riverfront Village of Arias, 'The Dozing' Inn", availability: "After saving Ameena, before war begins", requirements: "Must have answered choice #3 in PA22", action: "Speak to Ruddle and Rumina in the inn.", choices: [ { text: "Choice 1: Northwest gate.", effects: { other_sophia: 2, other_cliff: 2, other_maria: 2, other_nel: 3, other_roger: 2, other_albel: 2, other_peppita: 2, other_mirage: 2, other_adray: 1 } }, { text: "Choice 2: Southwest gate.", effects: { other_sophia: 2, other_cliff: 2, other_maria: 2, other_roger: 2, other_peppita: 2, other_mirage: 2, other_adray: 3 } }, { text: "Choice 3: Go east.", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -2, other_mirage: -2, other_adray: -3 } } ] },
+            { paId: "PA24", location: "Royal City of Airyglyph, 'Wyvern's Tail' Inn", availability: "After saving Ameena, before war", requirements: "Must have answered choices 1 or 2 in PA23", action: "Speak to Ruddle and Rumina in the inn.", choices: [ { text: "Choice 1: You already passed Kirlsa.", effects: { other_sophia: 2, other_cliff: 2, other_maria: 2, other_nel: 2, other_roger: 2, other_albel: 1, other_peppita: 2, other_mirage: 2, other_adray: 2 } }, { text: "Choice 2: You're almost at Kirlsa.", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -2, other_roger: -2, other_albel: -1, other_peppita: -2, other_mirage: -2, other_adray: -2 } } ] },
+            { paId: "PA25", location: "Lost City of Surferio", availability: "After saving Ameena, before defeating Crosell", requirements: "Must have answered choice 1 in PA21", action: "Find and speak to Roger and friends outside.", choices: [ { text: "Choice 1: Cooperate.", effects: { other_sophia: 2, other_cliff: -2, other_maria: -1, other_roger: 5, other_albel: -2, other_peppita: 1, other_mirage: 2, other_adray: 4, fayt_cliff: -1 } }, { text: "Choice 2: Refuse to cooperate.", effects: { other_sophia: -1, other_cliff: 2, other_maria: 2, other_nel: -1, other_roger: -5, other_albel: 2, other_peppita: 2, other_mirage: -2, other_adray: -2, fayt_roger: -2 } } ] },
+            { paId: "PA26", location: "Aquios, East Side Private Home", availability: "Before first meeting with Queen", requirements: "None", action: "Speak to man 2 doors down from grocer (East).", choices: [ { text: "Spoke to man", effects: { other_nel: -2, other_albel: -1, fayt_nel: 2 } } ] }, // Note: FAQ says results are overall, implying no choice needed, just triggering it.
+            { paId: "PA27", location: "Aquios, Castle Aquaria, First Floor", availability: "Before first meeting with Queen", requirements: "None", action: "Explore instead of following Nel, talk at stairs.", choices: [ { text: "Explored (Stairs)", effects: { other_sophia: -2, other_cliff: -2, other_maria: -3, other_nel: -3, other_roger: -1, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: -1 } } ] },
+            { paId: "PA28", location: "Aquios, Castle Aquaria, Second Floor", availability: "Before first meeting with Queen", requirements: "None", action: "Explore instead of following Nel, talk at chamber.", choices: [ { text: "Explored (Chamber)", effects: { other_sophia: -2, other_cliff: -2, other_maria: -3, other_nel: -3, other_roger: -1, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: -1 } } ] },
+            { paId: "PA29", location: "Peterny, North Side", availability: "After audience with Queen, before finding Copper Ore", requirements: "None", action: "Talk to Cliff in north Peterny.", choices: [ { text: "Talked to Cliff", effects: { other_sophia: -3, other_cliff: -3, other_maria: -2, other_nel: -3, other_roger: -2, other_albel: -2, other_peppita: -2, other_mirage: -4, other_adray: -2, fayt_cliff: 2 } } ] },
+            { paId: "PA30", location: "Arias, South Gate", availability: "After speaking with Clair, before finding Copper Ore", requirements: "None", action: "Speak to Fervent Man.", choices: [ { text: "Choice 1: I'll do what I can.", effects: { other_sophia: -3, other_cliff: 2, other_maria: -5, other_nel: 5, other_roger: -1, other_albel: -2, other_peppita: -5, other_mirage: 3, other_adray: -4 } }, { text: "Choice 2: Leave it to me.", effects: { other_sophia: -5, other_cliff: -2, other_maria: -7, other_nel: 4, other_roger: 3, other_albel: 5, other_peppita: -7, other_mirage: -4, other_adray: 4 } }, { text: "Choice 3: So you're saying the situation is grave?", effects: { other_nel: 3, other_albel: -4, other_adray: -2 } } ] },
+            { paId: "PA31", location: "Arias, South Gate", availability: "After speaking with Clair, before finding Copper Ore", requirements: "Must have answered choice 3 in PA30", action: "After PA30, speak with Fervent Man again.", choices: [ { text: "Spoke again (after Choice 3)", effects: { fayt_nel: 3 } } ] },
+            { paId: "PA32", location: "Arias, Lord's Mansion, Conference Room", availability: "After storyline battle near mines, before finding Copper Ore", requirements: "None", action: "Speak to Clair.", choices: [ { text: "Choice 1: She's been more than useful.", effects: { other_sophia: 1, other_cliff: 2, other_nel: 2, other_roger: 1, other_albel: -3, other_peppita: 1, other_mirage: 1, other_adray: -1, fayt_nel: 4 } }, { text: "Choice 2: I'm disappointed, to tell you the truth.", effects: { other_sophia: -4, other_cliff: -3, other_maria: -1, other_nel: -6, other_roger: -2, other_peppita: -3, other_mirage: -1, other_adray: 3, fayt_nel: -5 } } ] },
+            { paId: "PA33", location: "Arias, Lord's Mansion, Bedroom", availability: "After battle with Albel, before returning to Aquios", requirements: "None", action: "Attempt to speak to Farleen.", choices: [ { text: "Choice 1: Leave her alone.", effects: { other_sophia: 1, other_nel: 2, other_peppita: 1, other_mirage: 1, other_adray: -2 } }, { text: "Choice 2: Try poking at her cheek.", effects: { other_sophia: -2, other_maria: -1, other_nel: 0, other_roger: 1, other_albel: -2, other_peppita: 2, other_mirage: -1, other_adray: -1 } }, { text: "Choice 3: Try tickling the end of her nose.", effects: { other_sophia: -3, other_maria: -2, other_roger: 2, other_albel: -1, other_mirage: -2, other_adray: 3 } } ] },
+            { paId: "PA34", location: "Aquios, Castle Aquaria, Audience Chamber", availability: "After obtaining Copper Ore, before war", requirements: "None", action: "Return to Queen's Audience Chamber before leaving.", choices: [ { text: "Choice 1: Yes (Join Adray).", effects: { other_cliff: 1, other_maria: -1, other_nel: -1, other_roger: 3, other_albel: 2, other_peppita: 2, other_mirage: 1, other_adray: 3, fayt_adray: 2 } }, { text: "Choice 2: No (Don't Join Adray).", effects: { other_sophia: -1, other_maria: 1, other_nel: 2, other_roger: -2, other_albel: -1, other_peppita: -1, other_adray: -1, fayt_adray: -2 } } ] },
+            { paId: "PA35", location: "Arias, Lord's Mansion, Conference Room", availability: "After resting at Mansion, before war.", requirements: "None", action: "Speak to Clair (Optional PA).", choices: [ { text: "Choice 1: Yes.", effects: {} }, { text: "Choice 2: No.", effects: { other_sophia: 2, other_cliff: -3, other_maria: 3, other_nel: 4, other_roger: -3, other_albel: -5, other_peppita: -4, other_mirage: 4, other_adray: -5 } } ] },
+            { paId: "PA36", location: "Peterny, Center Plaza", availability: "After war, before checking Sacred Orb", requirements: "None", action: "Speak to man at table.", choices: [ { text: "Choice 1: Yes, I really want to hear about it.", effects: { other_sophia: -2, other_cliff: 2, other_maria: -2, other_nel: 3, other_roger: 2, other_albel: -3, other_peppita: 2, other_mirage: -2, other_adray: 3 } }, { text: "Choice 2: I think I'll pass.", effects: { other_sophia: 2, other_cliff: -1, other_maria: 3, other_nel: -3, other_roger: -3, other_albel: 2, other_peppita: -2, other_mirage: 2, other_adray: -3 } } ] },
+            { paId: "PA37", location: "Arias, Cemetery", availability: "After war, before checking Sacred Orb", requirements: "None", action: "Talk to Maria.", choices: [ { text: "Choice 1: But you have the same strange power, right?", effects: { other_sophia: -1, other_cliff: -2, other_maria: 4, other_nel: -1, other_roger: -1, other_peppita: -2, other_mirage: -1, other_adray: -2, fayt_maria: -1 } }, { text: "Choice 2: No! I'm just a normal human being!", effects: { other_sophia: -2, other_cliff: -4, other_maria: -1, other_nel: -4, other_roger: -3, other_albel: -5, other_peppita: -2, other_mirage: -3, other_adray: -4, fayt_maria: -3 } }, { text: "Choice 3: You may be right, but...", effects: { other_sophia: 3, other_cliff: 4, other_maria: 7, other_nel: 3, other_roger: 3, other_albel: 4, other_peppita: 4, other_mirage: 3, other_adray: 6, fayt_maria: 3 } } ] },
+            { paId: "PA38", location: "Kirlsa, Home by 'Iron Maiden' Inn", availability: "After war, before battle with Crosell", requirements: "None", action: "Talk to girl in house.", choices: [ { text: "Choice 1: Yes, it's true.", effects: { other_sophia: -3, other_cliff: -3, other_maria: -3, other_nel: -5, other_roger: -3, other_peppita: -3, other_mirage: -3 } }, { text: "Choice 2: No, it's not true.", effects: { other_sophia: 3, other_cliff: 3, other_maria: 3, other_nel: 5, other_roger: 3, other_albel: 3, other_peppita: 3, other_mirage: 3, other_adray: 3 } } ] },
+            { paId: "PA39", location: "Airyglyph, Aqueduct entrance", availability: "While Queen travels with you", requirements: "None", action: "Speak to Adray.", choices: [ { text: "Spoke to Adray", effects: { other_sophia: -2, other_cliff: 1, other_maria: -1, other_nel: -4, other_roger: 2, other_albel: 1, other_peppita: -2, other_mirage: -1, other_adray: 3, fayt_adray: 1 } } ] },
+            { paId: "PA40", location: "Airyglyph, Airyglyph Castle, First Floor", availability: "Going to recruit Albel", requirements: "None", action: "Don't follow Woltar or talk twice.", choices: [ { text: "Didn't Follow Woltar", effects: { other_sophia: -2, other_cliff: -2, other_maria: -3, other_nel: -2, other_roger: -1, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: 1 } }, { text: "Spoke to Woltar Twice", effects: { other_sophia: -4, other_cliff: -2, other_maria: -2, other_nel: -3, other_roger: -2, other_albel: 2, other_peppita: -4, other_mirage: -3, other_adray: 3 } } ] },
+            { paId: "PA41", location: "Airyglyph, Airyglyph Castle, Guard Room", availability: "Going to recruit Albel", requirements: "None", action: "Go to Treasure Room or First Floor instead of following Woltar.", choices: [ { text: "Didn't Follow (Guard Room)", effects: { other_sophia: -2, other_cliff: -2, other_maria: -3, other_nel: -2, other_roger: -1, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: 1 } } ] },
+            { paId: "PA42", location: "Kirlsa, Mansion of Lord Woltar, Second Floor", availability: "After recruiting Albel, before defeating Crosell", requirements: "None", action: "Enter Woltar's office.", choices: [ { text: "Entered Office", effects: { other_nel: -1, other_adray: 1, fayt_nel: 3 } } ] },
+            { paId: "PA43", location: "Airyglyph, Airyglyph Castle, King's Official Office", availability: "After recruiting Albel, before defeating Crosell", requirements: "None", action: "Enter king's office (2F).", choices: [ { text: "Choice 1: Okay, I'll deliver the letter.", effects: { other_sophia: 2, other_cliff: -3, other_maria: -2, other_nel: -3, other_roger: 2, other_peppita: 3, other_mirage: -1, other_adray: 3 } }, { text: "Choice 2: I'm sorry, but I must refuse.", effects: { other_sophia: -2, other_cliff: 3, other_maria: 2, other_nel: 3, other_roger: -2, other_peppita: -3, other_mirage: 1, other_adray: -3 } } ] },
+            { paId: "PA44", location: "Peterny, West Side", availability: "After recruiting Albel, before defeating Crosell", requirements: "None", action: "Speak to Albel.", choices: [ { text: "Choice 1: You lacked compassion.", effects: { other_sophia: 4, other_cliff: 2, other_maria: -2, other_nel: -4, other_roger: -3, other_albel: -5, other_peppita: 6, other_mirage: 2, other_adray: 4, fayt_albel: -2 } }, { text: "Choice 2: I suppose it was bad luck.", effects: { other_sophia: 3, other_cliff: 4, other_maria: 2, other_nel: 1, other_albel: 2, other_peppita: -2, other_adray: -1, fayt_albel: 3 } }, { text: "Choice 3: King should've been more ruthless.", effects: { other_sophia: -7, other_cliff: -5, other_maria: -4, other_nel: -6, other_roger: 2, other_albel: 6, other_peppita: -7, other_mirage: -4, other_adray: -3, fayt_albel: 5 } } ] },
+            { paId: "PA45", location: "Peterny, West Side, 'The Front Door' Luxury Inn", availability: "After recruiting Albel, before defeating Crosell", requirements: "None", action: "Stay at the inn.", choices: [ { text: "Choice 1: I hate you.", effects: { other_sophia: -2, other_cliff: 2, other_nel: 2, other_albel: -3, other_peppita: -2, other_adray: -2 } }, { text: "Choice 2: Not really.", effects: { other_sophia: 1, other_cliff: -1, other_maria: -1, other_roger: 2, other_albel: 5, other_peppita: 2, other_adray: 3 } } ] },
+            { paId: "PA46", location: "Battleship Aquaelie, Private Room (Cliff's)", availability: "After boarding Aquaelie, before bed", requirements: "None", action: "Speak to Cliff.", choices: [ { text: "Spoke to Cliff", effects: { other_maria: 1, other_albel: 1, other_peppita: -1, fayt_cliff: 2 } } ] },
+            { paId: "PA47", location: "Battleship Aquaelie, Private Room (Sophia's)", availability: "After boarding Aquaelie, before bed", requirements: "None", action: "Speak to Sophia.", choices: [ { text: "Choice 1: She must have known...", effects: { other_maria: 1, other_albel: 1, other_peppita: -1, fayt_sophia: 2 } }, { text: "Choice 2: She must not have known...", effects: { other_sophia: 5, other_cliff: 3, other_maria: 4, other_nel: 3, other_roger: 3, other_albel: 4, other_peppita: 4, other_mirage: 3, other_adray: 2, fayt_sophia: 1 } } ] },
+            { paId: "PA48", location: "Battleship Aquaelie, Private Room (Sgt. Gilm's)", availability: "After bed, before Bridge", requirements: "None", action: "Talk to the man.", choices: [ { text: "Choice 1: Yes.", effects: { other_sophia: -1, other_cliff: 3, other_maria: -1, other_nel: 2, other_roger: 3, other_albel: 5, other_peppita: 2, other_mirage: 1, other_adray: 5 } }, { text: "Choice 2: No.", effects: { other_sophia: 2, other_cliff: -2, other_maria: 2, other_nel: -1, other_roger: -1, other_albel: -3, other_peppita: -1, other_mirage: -1, other_adray: -3 } } ] },
+            { paId: "PA49", location: "Moonbase, Main Rec Area, 'The Red Eye' Bar", availability: "After Proclaimer, before finding Lab", requirements: "Peppita in party", action: "Enter the bar", choices: [ { text: "Entered Bar", effects: { fayt_peppita: 1 } } ] },
+            { paId: "PA50", location: "Battleship Aquaelie, Guest Room (Sophia's)", availability: "After returning to Aquaelie, before bed", requirements: "None", action: "Speak to Sophia.", choices: [ { text: "Spoke to Sophia", effects: { other_sophia: 6, other_cliff: 2, other_maria: 6, other_nel: 4, other_roger: 2, other_albel: 4, other_peppita: 4, other_mirage: 2, other_adray: 3, fayt_sophia: 8 } } ] },
+            { paId: "PA51", location: "Arkives, Off Main Square", availability: "After entering Arkives to end", requirements: "None", action: "Speak to Albel.", choices: [ { text: "Choice 1: As long as you understand.", effects: { other_sophia: -4, other_cliff: -1, other_maria: 2, other_nel: -2, other_roger: -1, other_albel: 3, other_peppita: -5, other_mirage: -2, other_adray: -2, fayt_albel: 1 } }, { text: "Choice 2: Just cut it out already!", effects: { other_sophia: 3, other_cliff: 2, other_maria: 1, other_roger: 1, other_albel: -2, other_peppita: 3, other_mirage: 2, other_adray: 2, fayt_albel: -3 } } ] },
+            { paId: "PA52", location: "Gemity, Fighting Arena Mini-Game", availability: "After entering Gemity to end", requirements: "None", action: "Register for Ranking Battle.", choices: [ { text: "Team: Knights Between Time", effects: { other_sophia: 1, other_maria: 2, other_nel: 1, other_roger: -1, other_albel: -2, other_peppita: -1, other_mirage: 1, other_adray: -1 } }, { text: "Team: Steel Knights", effects: { other_sophia: -2, other_cliff: 2, other_maria: 1, other_nel: -1, other_roger: 1, other_albel: 1, other_peppita: -1, other_adray: -1 } }, { text: "Team: Arthur & Knights of Teatable", effects: { other_sophia: -1, other_cliff: -1, other_maria: -1, other_nel: -1, other_roger: 2, other_albel: -1, other_peppita: 1, other_adray: 2 } }, { text: "Team: Rebels Without Existence", effects: { other_sophia: -1, other_cliff: 1, other_maria: 1, other_nel: 2, other_roger: -1, other_albel: 1, other_peppita: -2, other_adray: -1 } }, { text: "Team: Arcane Warriors Black Brigade", effects: { other_cliff: 1, other_maria: -2, other_roger: -1, other_albel: 2, other_mirage: 1, other_adray: -1 } }, { text: "Team: Mystic Dragon Eyes", effects: { other_sophia: 1, other_maria: 1, other_nel: -1, other_albel: -1, other_mirage: 1, other_adray: -1 } }, { text: "Team: Onward! Defrosted Tuna", effects: { other_cliff: -1, other_maria: -1, other_nel: -2, other_albel: -1, other_peppita: 2, other_mirage: -1, other_adray: 2 } }, { text: "Team: Fayt and Company", effects: { other_sophia: 2, other_cliff: -1, other_nel: 1, other_roger: -1, other_peppita: 1, other_adray: 1 } } ] },
+            { paId: "PA53", location: "Airyglyph, Castle Watchtower", availability: "After returning to Elicoor II, before Sphere", requirements: "None", action: "Speak to Sophia.", choices: [ { text: "Choice 1: No need to worry...", effects: { other_sophia: -1, other_cliff: -1, other_maria: 2, other_nel: 1, other_roger: -1, other_albel: 3, other_peppita: -2, other_mirage: -1, other_adray: 3, fayt_sophia: 1 } }, { text: "Choice 2: Everything happens for a reason.", effects: { other_sophia: 4, other_cliff: 1, other_maria: -2, other_nel: 2, other_roger: 1, other_albel: -1, other_peppita: 2, other_mirage: 1, other_adray: 2, fayt_sophia: 1 } }, { text: "Choice 3: Be more serious.", effects: { other_sophia: -3, other_cliff: -1, other_maria: 2, other_nel: 3, other_roger: -1, other_albel: 3, other_peppita: -2, other_mirage: 2, other_adray: -3, fayt_sophia: -2 } } ] },
+            { paId: "PA54", location: "Aquios, Castle Library of Runology", availability: "After returning to Elicoor II, before Sphere", requirements: "None", action: "Speak to Runologist at table.", choices: [ { text: "Choice 1: Faster than light.", effects: { other_sophia: -3, other_cliff: -2, other_maria: -5, other_nel: 3, other_roger: 5, other_albel: 3, other_peppita: -3, other_mirage: -5, other_adray: -3 } }, { text: "Choice 2: Exploded from inside.", effects: { other_sophia: -1, other_cliff: -2, other_maria: -3, other_nel: -3, other_roger: -3, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: 3 } }, { text: "Choice 3: Just like you said.", effects: { other_sophia: -1, other_cliff: -2, other_maria: -3, other_nel: -3, other_roger: -3, other_albel: -3, other_peppita: -1, other_mirage: -3, other_adray: 3 } } ] },
+            { paId: "PA55", location: "Kirlsa, 'Master Slayer' Armorer, 2F", availability: "After returning to Elicoor II, before Sphere", requirements: "Roger in party", action: "Speak to Roger.", choices: [ { text: "Spoke to Roger", effects: { other_sophia: -2, other_nel: -1, other_roger: -3, other_albel: -3, other_peppita: -2, other_mirage: -1, other_adray: 2, fayt_roger: 2 } } ] },
+            { paId: "PA56", location: "Urssa Lava Cave, Crosell's Lair", availability: "After returning to Elicoor II to end", requirements: "Albel NOT in party, spoke to Woltar first.", action: "Fight Albel (Fayt only).", choices: [ { text: "Choice 1: Let him come.", effects: { other_sophia: -1, other_maria: 1, other_nel: -2, other_roger: 2, other_albel: 3, other_peppita: 2, other_adray: 2, fayt_sophia: 1, fayt_cliff: -4, fayt_maria: -3, fayt_albel: -2 } }, { text: "Choice 2: Don't let him come.", effects: { other_sophia: 2, other_cliff: 2, other_nel: 2, other_roger: 4, other_albel: 4, other_peppita: -2, other_mirage: -2, other_adray: -3, fayt_sophia: 1, fayt_cliff: -4, fayt_maria: -3, fayt_albel: -1 } }, { text: "Defeat Albel (No Room)", effects: { other_sophia: 1, other_cliff: 1, other_maria: 2, other_nel: 1, other_roger: 1, other_albel: -2, other_mirage: 1, fayt_sophia: 1, fayt_cliff: -4, fayt_maria: -3, fayt_albel: -4 } }, { text: "Defeated by Albel", effects: { other_sophia: -2, other_cliff: -2, other_maria: -2, other_nel: -3, other_roger: -5, other_albel: -5, other_peppita: -2, other_mirage: -2, other_adray: -3, fayt_sophia: 1, fayt_cliff: -4, fayt_maria: -3, fayt_albel: -4 } } ] },
+            { paId: "PA57", location: "Diplo, Upper Deck", availability: "On Diplo (second time)", requirements: "None", action: "Speak to Marietta and Steeg.", choices: [ { text: "Spoke to Marietta/Steeg", effects: { other_maria: -1 } } ] }, // FAYT points missing in source - assuming 0
+            { paId: "PA58", location: "Airyglyph, Castle, 2F", availability: "After returning from Diplo to end", requirements: "Albel joined during Biwig Incident", action: "Approach king and Albel.", choices: [ { text: "Approached King/Albel", effects: { other_nel: -1, other_roger: 1, other_albel: -3, other_peppita: 1, fayt_albel: 5 } } ] },
+            { paId: "PA59", location: "Aquios, Castle Great Temple", availability: "After returning from Diplo to end", requirements: "Seen PA43 & related events", action: "Speak to old woman (Airy 2F), then Nel/friend (Aquios Temple).", choices: [ { text: "Choice 1: Congratulations.", effects: { other_sophia: 3, other_cliff: -3, other_maria: 5, other_nel: 5, other_roger: 5, other_albel: -5, other_peppita: 3, other_mirage: -1, other_adray: -2, fayt_nel: 5 } }, { text: "Choice 2: Isn't that a political marriage?", effects: { other_sophia: -5, other_cliff: -1, other_maria: -3, other_nel: -10, other_albel: 3, other_peppita: -5, other_mirage: -3, other_adray: 4 } }, { text: "Choice 3: What about Lady Elena?", effects: { other_sophia: 1, other_maria: -1, other_nel: -3, other_roger: 1, other_albel: 3, other_mirage: 1, other_adray: 2, fayt_nel: -3 } } ] },
+            { paId: "PA60", location: "Aquios, Castle 2F Balcony", availability: "After receiving Sacred Orb (re-enter Aquios) to end", requirements: "None", action: "Speak to Sophia.", choices: [ { text: "Choice 1: Are you unhappy... princess? (Sophia >= 40)", effects: { other_sophia: 12, other_cliff: -5, other_maria: -5, other_nel: -5, other_roger: -5, other_albel: -2, other_peppita: -7, other_mirage: -7, other_adray: -8, fayt_sophia: 10 } }, { text: "Choice 1: Are you unhappy... princess? (Sophia < 40)", effects: { other_sophia: -3, other_cliff: 2, other_maria: -5, other_nel: 3, other_roger: 3, other_albel: 1, other_peppita: 3, other_mirage: -1, fayt_sophia: -8 } }, { text: "Choice 2: Why even say that?", effects: { other_sophia: -5, other_cliff: -3, other_maria: -3, other_nel: -5, other_roger: 5, other_peppita: 3, other_mirage: -5, other_adray: -3, fayt_sophia: -3 } }, { text: "Choice 3: You're an idiot.", effects: { other_sophia: -8, other_cliff: -2, other_maria: 2, other_roger: -3, other_albel: 2, other_peppita: -3, other_mirage: 2, other_adray: 2, fayt_sophia: -4 } } ] }
+        ];
+
+        // --- Calculator Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const paListElement = document.getElementById('pa-list');
+            const scoresListOthersElement = document.getElementById('character-scores-others');
+            const scoresListFaytElement = document.getElementById('character-scores-fayt');
+            const resetButton = document.getElementById('reset-pa-scores');
+
+            let characterScoresOthers = {}; // Others -> Fayt
+            let characterScoresFayt = {};   // Fayt -> Others
+            let selectedChoices = {};       // { paId: choiceIndex }
+
+            function initializeScores() {
+                characterScoresOthers = { ...startingScoresOthers }; // Copy starting scores
+                characterScoresFayt = { ...startingScoresFayt };
+                // Ensure all tracked characters exist even if not in starting list
+                trackedCharacters.forEach(char => {
+                    if (!(char in characterScoresOthers)) characterScoresOthers[char] = 0;
+                    if (!(char in characterScoresFayt)) characterScoresFayt[char] = 0;
+                });
+                selectedChoices = {};
+                console.log("Scores Initialized:", { others: characterScoresOthers, fayt: characterScoresFayt });
+            }
+
+             function renderScores() {
+                 scoresListOthersElement.innerHTML = '';
+                 scoresListFaytElement.innerHTML = '';
+
+                 trackedCharacters.forEach(char => {
+                     // Others -> Fayt Score
+                     const scoreOther = characterScoresOthers[char];
+                     const liOther = document.createElement('li');
+                     liOther.className = 'score-entry';
+                     liOther.innerHTML = `
+                         <span class="char-name">${char}</span>
+                         <span class="char-score">${scoreOther}</span>
+                     `;
+                     scoresListOthersElement.appendChild(liOther);
+
+                     // Fayt -> Others Score
+                     const scoreFayt = characterScoresFayt[char];
+                     const liFayt = document.createElement('li');
+                     liFayt.className = 'score-entry';
+                     liFayt.innerHTML = `
+                          <span class="char-name">${char}</span>
+                          <span class="char-score">${scoreFayt}</span>
+                     `;
+                     scoresListFaytElement.appendChild(liFayt);
+                 });
+                 console.log("Scores Rendered:", { others: characterScoresOthers, fayt: characterScoresFayt });
+            }
+
+            function renderPAChoices() {
+                paListElement.innerHTML = '';
+                if (!paData || paData.length === 0) {
+                    paListElement.innerHTML = '<li class="loading-pa">No PA data found.</li>';
+                    return;
+                }
+
+                paData.forEach((pa) => {
+                    const li = document.createElement('li');
+                    li.className = 'pa-item';
+                    li.dataset.paId = pa.paId;
+
+                    // Add meta info (Location, Availability, Requirements)
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'pa-meta';
+                    metaDiv.innerHTML = `
+                        <strong>${pa.paId}:</strong> ${pa.location}<br>
+                        <em>Avail:</em> ${pa.availability || 'N/A'}<br>
+                        <em>Reqs:</em> ${pa.requirements || 'None'}
+                    `;
+                    li.appendChild(metaDiv);
+
+                    // Add Action description
+                    const actionP = document.createElement('p');
+                    actionP.className = 'pa-action';
+                    actionP.innerHTML = `<strong>Action:</strong> ${pa.action || 'N/A'}`;
+                    li.appendChild(actionP);
+
+                    const choicesDiv = document.createElement('div');
+                    choicesDiv.className = 'pa-choices';
+
+                    pa.choices.forEach((choice, choiceIndex) => {
+                        const button = document.createElement('button');
+                        button.className = 'pa-choice-button';
+                        // Shorten button text if needed, keep full text in title
+                        let buttonText = choice.text;
+                        if (buttonText.length > 60) { // Example length limit
+                           // buttonText = buttonText.substring(0, 57) + "...";
+                           // Keep full text for now, wrapping should handle it
+                        }
+                        button.textContent = buttonText;
+                        button.title = choice.text; // Show full text on hover
+                        button.dataset.paId = pa.paId;
+                        button.dataset.choiceIndex = choiceIndex;
+                        choicesDiv.appendChild(button);
+                        button.addEventListener('click', handleChoiceSelection);
+                    });
+
+                    li.appendChild(choicesDiv);
+                    paListElement.appendChild(li);
+                });
+            }
+
+            function handleChoiceSelection(event) {
+                const clickedButton = event.target;
+                const paId = clickedButton.dataset.paId;
+                const choiceIndex = parseInt(clickedButton.dataset.choiceIndex, 10);
+                const paItemGroup = clickedButton.closest('.pa-item');
+
+                if (!paId || isNaN(choiceIndex) || !paItemGroup) return;
+
+                const pa = paData.find(p => p.paId === paId);
+                if (!pa) { console.error("PA Data not found:", paId); return; }
+
+                const previouslySelectedIndex = selectedChoices[paId];
+                const currentChoiceData = pa.choices[choiceIndex];
+
+                // Undo previous choice first if it exists and is different
+                if (previouslySelectedIndex !== undefined && previouslySelectedIndex !== choiceIndex) {
+                    const previousChoiceData = pa.choices[previouslySelectedIndex];
+                    if (previousChoiceData?.effects) {
+                        applyAffectionChange(previousChoiceData.effects, true); // true = undo
+                    }
+                    const previousButton = paItemGroup.querySelector(`.pa-choice-button[data-choice-index="${previouslySelectedIndex}"]`);
+                    if (previousButton) previousButton.classList.remove('selected');
+                     console.log(`Undid PA ${paId}, Choice ${previouslySelectedIndex}`);
+                }
+
+                // Apply the new choice if it's not already selected
+                if (previouslySelectedIndex !== choiceIndex) {
+                    if (currentChoiceData?.effects) {
+                        applyAffectionChange(currentChoiceData.effects, false); // false = apply
+                    }
+                    selectedChoices[paId] = choiceIndex;
+                    clickedButton.classList.add('selected');
+                    console.log(`Applied PA ${paId}, Choice ${choiceIndex}`);
+                } else {
+                    // If clicking the already selected button, deselect it and undo
+                     if (currentChoiceData?.effects) {
+                        applyAffectionChange(currentChoiceData.effects, true); // undo
+                    }
+                    delete selectedChoices[paId];
+                    clickedButton.classList.remove('selected');
+                     console.log(`Deselected PA ${paId}, Choice ${choiceIndex}`);
+                }
+
+
+                renderScores();
+            }
+
+             function applyAffectionChange(effects, isUndo = false) {
+                 console.log(isUndo ? "Undoing effects:" : "Applying effects:", effects);
+                 for (const effectKey in effects) {
+                     const change = effects[effectKey] || 0; // Default to 0 if value is missing/falsy
+                     if (effectKey.startsWith('other_')) {
+                         const character = effectKey.substring(6); // Remove "other_" prefix
+                         if (characterScoresOthers.hasOwnProperty(character)) {
+                              characterScoresOthers[character] += isUndo ? -change : change;
+                         } else {
+                              console.warn(`Character "${character}" not found in Others scores for key ${effectKey}`);
+                         }
+                     } else if (effectKey.startsWith('fayt_')) {
+                         const character = effectKey.substring(5); // Remove "fayt_" prefix
+                          if (characterScoresFayt.hasOwnProperty(character)) {
+                             characterScoresFayt[character] += isUndo ? -change : change;
+                          } else {
+                               console.warn(`Character "${character}" not found in Fayt scores for key ${effectKey}`);
+                          }
+                     } else {
+                          console.warn(`Unknown effect key format: ${effectKey}`);
+                     }
+                 }
+            }
+
+            function handleReset() {
+                console.log("Resetting scores...");
+                initializeScores();
+                renderScores();
+                document.querySelectorAll('.pa-choice-button.selected').forEach(button => {
+                    button.classList.remove('selected');
+                });
+            }
+
+            // --- Initial Setup ---
+            initializeScores();
+            renderScores();
+            renderPAChoices();
+            resetButton.addEventListener('click', handleReset);
+        });
+
+    </script>
+
+</body>
+</html>
