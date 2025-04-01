@@ -71,6 +71,6 @@ This project is constantly evolving! Here's a glimpse of what's planned for the 
 *   **Original Guide Contributors (from original text)**: KusanagiLord, Holystar, Maiki, Paradisio, Lee, Revelation, David K, David B, Neil H, chilledlikeice, Bryan R, Ricky M, Richie C, Brigg, FFXdude,       trowabartan, ayce_shade, CJayC, Sailor Bacon, Sean, Mark, Jeremy, GameFAQs FAQ contributor community.
 *   **Original JavaScript Calculator v1.02:** Aerius
 *   **Original Modifications Javascript Calculator Modifications:** Brian Pendell (17 MAR 2014, 26 Dec 2021)
-*   **Interactive Wiki Adaptation:** Ometopi
+*   **Interactive Wiki Adaptation, modernisation, PA calculator, and rewrites:** Ometopi
 
 *   **Special Thanks:** tri-Ace for creating Star Ocean: Till the End of Time.
